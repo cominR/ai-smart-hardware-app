@@ -4,10 +4,9 @@ import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
 import {
   Monitor, Moon, Sun, Globe, Bell, Mail, Settings as SettingsIcon,
-  User, ChevronRight, Edit3, Calendar, MapPin, Phone, Briefcase,
-  Shield, Lock, Key, Smartphone, Eye, EyeOff, Save, Camera,
+  User, ChevronRight, Edit3, Shield, Lock, Key, Smartphone, Save, Camera,
   LogOut, Trash2, AlertTriangle, Info, HelpCircle, MessageSquare,
-  Download, Upload, RefreshCw, Wifi, Volume2, Vibrate
+  Volume2, Vibrate
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -140,31 +139,60 @@ const UserSettings: React.FC = () => {
 
   return (
     <div className="p-4 pb-20">
-      {/* 标签页导航 */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-6 overflow-hidden">
-        <div className="flex overflow-x-auto">
-          {tabs.map((tab) => {
-            const IconComponent = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+      {/* 设置菜单列表 */}
+      <div className="space-y-3">
+        {tabs.map((tab) => {
+          const IconComponent = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full flex items-center justify-between p-4 rounded-xl shadow-sm transition-all ${
+                activeTab === tab.id
+                  ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800'
+                  : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              <div className="flex items-center">
+                <div className={`p-2 rounded-lg mr-3 ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30'
-                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
-                }`}
-              >
-                <IconComponent size={16} className="mr-2" />
-                {tab.name}
-              </button>
-            );
-          })}
-        </div>
+                    ? 'bg-blue-100 dark:bg-blue-800/50'
+                    : 'bg-gray-100 dark:bg-gray-700'
+                }`}>
+                  <IconComponent
+                    size={20}
+                    className={
+                      activeTab === tab.id
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }
+                  />
+                </div>
+                <span className={`font-medium ${
+                  activeTab === tab.id
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-gray-800 dark:text-white'
+                }`}>
+                  {tab.name}
+                </span>
+              </div>
+              <ChevronRight
+                size={16}
+                className={
+                  activeTab === tab.id
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-gray-400 dark:text-gray-500'
+                }
+              />
+            </button>
+          );
+        })}
       </div>
 
-      {/* 个人信息修改 */}
-      {activeTab === 'profile' && (
+      {/* 内容区域 */}
+      <div className="mt-6">
+        {/* 个人信息修改 */}
+        {activeTab === 'profile' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -746,6 +774,7 @@ const UserSettings: React.FC = () => {
           </div>
         </motion.div>
       )}
+      </div>
     </div>
   );
 };
