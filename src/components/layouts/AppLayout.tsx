@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Cpu, User, Settings } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+
 import { motion } from 'framer-motion';
 
 interface AppLayoutProps {

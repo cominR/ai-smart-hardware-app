@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Cpu, Battery, Volume2, Trash2, Share2, Edit, UserCircle, MessageSquare, Mic, Settings, ChevronLeft, Brain, Sparkles, Radio, Play, Square, Heart, Smile, Notebook as Robot, Unlink, User, Calendar, MapPin, Briefcase, Phone, Mail, Save, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -98,8 +98,8 @@ const DeviceDetail: React.FC = () => {
     firmware: 'v2.3.1'
   });
 
-  // Available AI roles
-  const aiRoles: AIRole[] = [
+  // Available AI roles - memoized to prevent unnecessary re-renders
+  const aiRoles: AIRole[] = useMemo(() => [
     {
       id: 'assistant',
       name: '智能助手',
@@ -128,7 +128,7 @@ const DeviceDetail: React.FC = () => {
       icon: UserCircle,
       personality: '有什么想和我分享的吗？我一直在这里倾听。'
     }
-  ];
+  ], []);
   
   // Initialize with the device's volume
   useEffect(() => {

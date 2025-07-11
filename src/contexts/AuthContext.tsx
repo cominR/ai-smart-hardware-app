@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
 interface User {
   id: string;
@@ -38,7 +38,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, _password: string) => {
+  const login = async (email: string, password: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _password = password;
     // For demo purposes, simulate a successful login
     // In a real app, this would make an API call
     const mockUser: User = {
