@@ -304,9 +304,7 @@ const Home: React.FC = () => {
               绑定您的智能硬件设备，开启智能语音交互体验
             </p>
             
-            <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-              支持多种智能设备，简单几步即可完成绑定
-            </div>
+
           </div>
         </motion.div>
       </div>
