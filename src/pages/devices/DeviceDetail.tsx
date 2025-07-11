@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Battery, Volume2, Trash2, Share2, Edit, UserCircle, MessageSquare, Mic, ChevronLeft, Brain, Heart, Smile, Notebook as Robot, Unlink, User, Calendar, MapPin, Briefcase, Phone, Mail, Save, X } from 'lucide-react';
+import { Battery, Volume2, Trash2, Share2, Edit, UserCircle, MessageSquare, Mic, ChevronLeft, Brain, Heart, Smile, Notebook as Robot, Unlink, User, Calendar, MapPin, Briefcase, Phone, Mail, Save, X, Plus, BookOpen, Tag, Clock, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DeviceDetails {
@@ -41,6 +41,14 @@ interface PersonalInfo {
   preferences: string;
 }
 
+interface MemoryItem {
+  id: string;
+  content: string;
+  timestamp: string;
+  category: 'preference' | 'habit' | 'important' | 'other';
+  isEditing?: boolean;
+}
+
 const DeviceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -68,6 +76,12 @@ const DeviceDetail: React.FC = () => {
     personality: '',
     preferences: ''
   });
+
+  // 记忆功能状态
+  const [memories, setMemories] = useState<MemoryItem[]>([]);
+  const [newMemory, setNewMemory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<MemoryItem['category']>('important');
+  const [showAddMemory, setShowAddMemory] = useState(false);
   
   // Available AI models
   const aiModels = [
@@ -157,8 +171,42 @@ const DeviceDetail: React.FC = () => {
     setVolume(newVolume);
     setDevice({ ...device, volume: newVolume });
   };
-  
 
+  // 记忆功能处理函数
+  const handleAddMemory = () => {
+    if (!newMemory.trim()) return;
+
+    const memory: MemoryItem = {
+      id: `memory-${Date.now()}`,
+      content: newMemory.trim(),
+      timestamp: new Date().toLocaleString('zh-CN'),
+      category: selectedCategory
+    };
+
+    setMemories(prev => [memory, ...prev]);
+    setNewMemory('');
+    setShowAddMemory(false);
+  };
+
+  const handleEditMemory = (id: string, newContent: string) => {
+    setMemories(prev => prev.map(memory =>
+      memory.id === id
+        ? { ...memory, content: newContent, isEditing: false }
+        : memory
+    ));
+  };
+
+  const handleDeleteMemory = (id: string) => {
+    setMemories(prev => prev.filter(memory => memory.id !== id));
+  };
+
+  const toggleEditMemory = (id: string) => {
+    setMemories(prev => prev.map(memory =>
+      memory.id === id
+        ? { ...memory, isEditing: !memory.isEditing }
+        : { ...memory, isEditing: false }
+    ));
+  };
 
   // Handle device unbinding
   const handleUnbindDevice = async () => {
@@ -200,13 +248,49 @@ const DeviceDetail: React.FC = () => {
     // Show success message or toast
   };
 
-  // Load personal info on component mount
+  // Load personal info and memories on component mount
   useEffect(() => {
     const savedInfo = localStorage.getItem(`personalInfo_${device.id}`);
     if (savedInfo) {
       setPersonalInfo(JSON.parse(savedInfo));
     }
+
+    // Load memories from localStorage or set default examples
+    const savedMemories = localStorage.getItem(`memories_${device.id}`);
+    if (savedMemories) {
+      setMemories(JSON.parse(savedMemories));
+    } else {
+      // Set some example memories for demonstration
+      const exampleMemories: MemoryItem[] = [
+        {
+          id: 'memory-1',
+          content: '喜欢在早上7点被轻柔的音乐叫醒，不喜欢太突然的闹钟声',
+          timestamp: '2024-01-10 08:30:00',
+          category: 'preference'
+        },
+        {
+          id: 'memory-2',
+          content: '每天晚上10点后会进入休息模式，希望设备音量自动降低',
+          timestamp: '2024-01-09 22:15:00',
+          category: 'habit'
+        },
+        {
+          id: 'memory-3',
+          content: '对古典音乐特别感兴趣，经常询问相关的音乐推荐',
+          timestamp: '2024-01-08 15:20:00',
+          category: 'preference'
+        }
+      ];
+      setMemories(exampleMemories);
+    }
   }, [device.id]);
+
+  // Save memories to localStorage when memories change
+  useEffect(() => {
+    if (memories.length > 0) {
+      localStorage.setItem(`memories_${device.id}`, JSON.stringify(memories));
+    }
+  }, [memories, device.id]);
 
   // Handle personal info field change
   const handlePersonalInfoChange = (field: keyof PersonalInfo, value: string) => {
@@ -654,9 +738,115 @@ const DeviceDetail: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Memory Function */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <BookOpen size={20} className="text-purple-500 mr-2" />
+                  <h3 className="font-medium text-gray-800 dark:text-white">设备记忆</h3>
+                </div>
+                <button
+                  onClick={() => setShowAddMemory(!showAddMemory)}
+                  className="flex items-center px-3 py-1.5 text-sm bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                >
+                  <Plus size={16} className="mr-1" />
+                  添加记忆
+                </button>
+              </div>
+
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                记录与设备对话时的重要信息，帮助AI更好地了解您的偏好和需求
+              </p>
+
+              {/* Add Memory Form */}
+              {showAddMemory && (
+                <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      记忆分类
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { value: 'preference', label: '偏好', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
+                        { value: 'habit', label: '习惯', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
+                        { value: 'important', label: '重要', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' },
+                        { value: 'other', label: '其他', color: 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200' }
+                      ].map((category) => (
+                        <button
+                          key={category.value}
+                          onClick={() => setSelectedCategory(category.value as MemoryItem['category'])}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                            selectedCategory === category.value
+                              ? category.color
+                              : 'bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-400'
+                          }`}
+                        >
+                          {category.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      记忆内容
+                    </label>
+                    <textarea
+                      value={newMemory}
+                      onChange={(e) => setNewMemory(e.target.value)}
+                      placeholder="记录重要信息，如：喜欢早上7点叫醒、不喜欢太大声音、偏好轻音乐等..."
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={handleAddMemory}
+                      disabled={!newMemory.trim()}
+                      className="flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Save size={16} className="mr-1" />
+                      保存记忆
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAddMemory(false);
+                        setNewMemory('');
+                      }}
+                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      取消
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Memory List */}
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {memories.length > 0 ? (
+                  memories.map((memory) => (
+                    <MemoryCard
+                      key={memory.id}
+                      memory={memory}
+                      onEdit={handleEditMemory}
+                      onDelete={handleDeleteMemory}
+                      onToggleEdit={toggleEditMemory}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-6 text-gray-500 dark:text-gray-400">
+                    <BookOpen size={32} className="mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">暂无记忆记录</p>
+                    <p className="text-xs mt-1">点击"添加记忆"开始记录重要信息</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </motion.div>
         )}
-        
+
         {/* Chat History Tab */}
         {activeTab === 'chat' && (
           <motion.div
@@ -831,6 +1021,106 @@ const DeviceDetail: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+    </div>
+  );
+};
+
+// Memory Card Component
+interface MemoryCardProps {
+  memory: MemoryItem;
+  onEdit: (id: string, newContent: string) => void;
+  onDelete: (id: string) => void;
+  onToggleEdit: (id: string) => void;
+}
+
+const MemoryCard: React.FC<MemoryCardProps> = ({ memory, onEdit, onDelete, onToggleEdit }) => {
+  const [editContent, setEditContent] = useState(memory.content);
+
+  const getCategoryInfo = (category: MemoryItem['category']) => {
+    switch (category) {
+      case 'preference':
+        return { label: '偏好', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' };
+      case 'habit':
+        return { label: '习惯', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' };
+      case 'important':
+        return { label: '重要', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' };
+      case 'other':
+        return { label: '其他', color: 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200' };
+      default:
+        return { label: '其他', color: 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200' };
+    }
+  };
+
+  const categoryInfo = getCategoryInfo(memory.category);
+
+  const handleSaveEdit = () => {
+    if (editContent.trim()) {
+      onEdit(memory.id, editContent.trim());
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditContent(memory.content);
+    onToggleEdit(memory.id);
+  };
+
+  return (
+    <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
+      <div className="flex items-start justify-between mb-2">
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${categoryInfo.color}`}>
+          {categoryInfo.label}
+        </span>
+        <div className="flex items-center space-x-1">
+          <button
+            onClick={() => onToggleEdit(memory.id)}
+            className="p-1 text-gray-500 hover:text-blue-500 transition-colors"
+            title="编辑"
+          >
+            <Edit size={14} />
+          </button>
+          <button
+            onClick={() => onDelete(memory.id)}
+            className="p-1 text-gray-500 hover:text-red-500 transition-colors"
+            title="删除"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      </div>
+
+      {memory.isEditing ? (
+        <div className="space-y-2">
+          <textarea
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            rows={2}
+          />
+          <div className="flex space-x-2">
+            <button
+              onClick={handleSaveEdit}
+              className="flex items-center px-2 py-1 text-xs bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+            >
+              <Check size={12} className="mr-1" />
+              保存
+            </button>
+            <button
+              onClick={handleCancelEdit}
+              className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+            >
+              取消
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <p className="text-sm text-gray-800 dark:text-white mb-2">{memory.content}</p>
+          <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+            <Clock size={12} className="mr-1" />
+            {memory.timestamp}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
