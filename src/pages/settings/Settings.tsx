@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import {
   Monitor, Moon, Sun, Globe, Bell, Mail, Settings as SettingsIcon,
   User, ChevronRight, Edit3, Shield, Lock, Key, Smartphone, Save, Camera,
-  LogOut, Trash2, AlertTriangle, Info, HelpCircle, MessageSquare,
+  LogOut, AlertTriangle, Info, HelpCircle, MessageSquare,
   Volume2, Vibrate
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -116,16 +116,7 @@ const UserSettings: React.FC = () => {
     }
   };
 
-  const handleDeleteAccount = () => {
-    if (confirm('确定要删除账号吗？此操作不可恢复！')) {
-      if (confirm('请再次确认删除账号，所有数据将永久丢失！')) {
-        // 这里应该调用API删除账号
-        alert('账号删除成功');
-        logout();
-        navigate('/login');
-      }
-    }
-  };
+
 
   // 设置选项配置
   const settingsOptions = [
@@ -486,19 +477,7 @@ const UserSettings: React.FC = () => {
                 </button>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-800 dark:text-white font-medium">删除账号</p>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">永久删除账号和所有数据，此操作不可恢复</p>
-                </div>
-                <button
-                  onClick={handleDeleteAccount}
-                  className="flex items-center px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                >
-                  <Trash2 size={16} className="mr-2" />
-                  删除账号
-                </button>
-              </div>
+
             </div>
           </div>
         </motion.div>
