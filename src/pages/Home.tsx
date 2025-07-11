@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { 
-  Plus, Cpu, Settings, MessageSquare, Wifi, Battery, Volume2, ChevronRight, 
-  Bell, Gift, Headphones, Smartphone, Gamepad2, Speaker, Camera, 
-  Star, ArrowRight, Calendar, Users, Zap, Shield, Mic, Play, Upload,
-  Clock, CheckCircle, AlertCircle, Crown, Lock, WifiOff
+import { useAuth } from '../hooks/useAuth';
+import {
+  Plus, Cpu, Bell, Gift, Headphones, Speaker,
+  Star, ArrowRight, Calendar, Users, Zap, Shield,
+  Clock, CheckCircle, AlertCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 

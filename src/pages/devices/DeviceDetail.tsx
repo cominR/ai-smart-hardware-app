@@ -144,7 +144,7 @@ const DeviceDetail: React.FC = () => {
         timestamp: '10:30' 
       }
     ]);
-  }, [device, selectedRole]);
+  }, [device, selectedRole, aiRoles]);
   
   // Update device name
   const handleUpdateName = () => {

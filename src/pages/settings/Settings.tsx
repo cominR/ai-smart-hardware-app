@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../hooks/useTheme';
+import { useAuth } from '../../hooks/useAuth';
 import {
   Monitor, Moon, Sun, Globe, Bell, Mail, Settings as SettingsIcon,
   User, ChevronRight, Edit3, Calendar, MapPin, Phone, Briefcase
