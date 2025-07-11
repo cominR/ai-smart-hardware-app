@@ -16,7 +16,7 @@ const UserSettings: React.FC = () => {
   const navigate = useNavigate();
 
   // 状态管理
-  const [activeTab, setActiveTab] = useState('profile');
+  const [currentView, setCurrentView] = useState('main'); // 'main' 或具体的设置页面
   const [language, setLanguage] = useState('zh-CN');
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
@@ -127,8 +127,8 @@ const UserSettings: React.FC = () => {
     }
   };
 
-  // 标签页配置
-  const tabs = [
+  // 设置选项配置
+  const settingsOptions = [
     { id: 'profile', name: '修改个人信息', icon: User },
     { id: 'security', name: '账号安全', icon: Shield },
     { id: 'notifications', name: '通知设置', icon: Bell },
@@ -137,62 +137,73 @@ const UserSettings: React.FC = () => {
     { id: 'about', name: '关于应用', icon: Info }
   ];
 
+  // 处理选项点击
+  const handleOptionClick = (optionId: string) => {
+    setCurrentView(optionId);
+  };
+
+  // 返回主菜单
+  const handleBackToMain = () => {
+    setCurrentView('main');
+    setIsEditing(false);
+    setShowPasswordChange(false);
+  };
+
+  // 渲染主菜单
+  const renderMainMenu = () => (
+    <div className="space-y-3">
+      {settingsOptions.map((option) => {
+        const IconComponent = option.icon;
+        return (
+          <button
+            key={option.id}
+            onClick={() => handleOptionClick(option.id)}
+            className="w-full flex items-center justify-between p-4 rounded-xl shadow-sm transition-all bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <div className="flex items-center">
+              <div className="p-2 rounded-lg mr-3 bg-gray-100 dark:bg-gray-700">
+                <IconComponent
+                  size={20}
+                  className="text-gray-600 dark:text-gray-400"
+                />
+              </div>
+              <span className="font-medium text-gray-800 dark:text-white">
+                {option.name}
+              </span>
+            </div>
+            <ChevronRight
+              size={16}
+              className="text-gray-400 dark:text-gray-500"
+            />
+          </button>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="p-4 pb-20">
-      {/* 设置菜单列表 */}
-      <div className="space-y-3">
-        {tabs.map((tab) => {
-          const IconComponent = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center justify-between p-4 rounded-xl shadow-sm transition-all ${
-                activeTab === tab.id
-                  ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800'
-                  : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-            >
-              <div className="flex items-center">
-                <div className={`p-2 rounded-lg mr-3 ${
-                  activeTab === tab.id
-                    ? 'bg-blue-100 dark:bg-blue-800/50'
-                    : 'bg-gray-100 dark:bg-gray-700'
-                }`}>
-                  <IconComponent
-                    size={20}
-                    className={
-                      activeTab === tab.id
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : 'text-gray-600 dark:text-gray-400'
-                    }
-                  />
-                </div>
-                <span className={`font-medium ${
-                  activeTab === tab.id
-                    ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-gray-800 dark:text-white'
-                }`}>
-                  {tab.name}
-                </span>
-              </div>
-              <ChevronRight
-                size={16}
-                className={
-                  activeTab === tab.id
-                    ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-gray-400 dark:text-gray-500'
-                }
-              />
-            </button>
-          );
-        })}
-      </div>
+      {/* 页面标题和返回按钮 */}
+      {currentView !== 'main' && (
+        <div className="flex items-center mb-6">
+          <button
+            onClick={handleBackToMain}
+            className="flex items-center text-blue-500 hover:text-blue-600 transition-colors"
+          >
+            <ChevronRight size={20} className="rotate-180 mr-2" />
+            <span>返回</span>
+          </button>
+          <h1 className="text-lg font-semibold text-gray-800 dark:text-white ml-4">
+            {settingsOptions.find(opt => opt.id === currentView)?.name}
+          </h1>
+        </div>
+      )}
 
-      {/* 内容区域 */}
-      <div className="mt-6">
-        {/* 个人信息修改 */}
-        {activeTab === 'profile' && (
+      {/* 主菜单 */}
+      {currentView === 'main' && renderMainMenu()}
+
+      {/* 个人信息修改 */}
+      {currentView === 'profile' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -336,7 +347,7 @@ const UserSettings: React.FC = () => {
       )}
 
       {/* 账号安全 */}
-      {activeTab === 'security' && (
+      {currentView === 'security' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -494,7 +505,7 @@ const UserSettings: React.FC = () => {
       )}
 
       {/* 通知设置 */}
-      {activeTab === 'notifications' && (
+      {currentView === 'notifications' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -562,7 +573,7 @@ const UserSettings: React.FC = () => {
       )}
 
       {/* 隐私设置 */}
-      {activeTab === 'privacy' && (
+      {currentView === 'privacy' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -624,7 +635,7 @@ const UserSettings: React.FC = () => {
       )}
 
       {/* 通用设置 */}
-      {activeTab === 'general' && (
+      {currentView === 'general' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -700,7 +711,7 @@ const UserSettings: React.FC = () => {
       )}
 
       {/* 关于应用 */}
-      {activeTab === 'about' && (
+      {currentView === 'about' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -774,7 +785,6 @@ const UserSettings: React.FC = () => {
           </div>
         </motion.div>
       )}
-      </div>
     </div>
   );
 };
