@@ -7,7 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "git:setup": "scripts\\setup-git-hooks.bat",
+    "git:commit": "scripts\\quick-commit.bat",
+    "git:status": "git status",
+    "git:log": "git log --oneline -10",
+    "git:branches": "git branch -a"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",
