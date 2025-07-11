@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Cpu, Battery, Volume2, Trash2, Share2, Edit, UserCircle, MessageSquare, Mic, Settings, ChevronLeft, Brain, Sparkles, Radio, Play, Square, Heart, Smile, Notebook as Robot, Unlink, User, Calendar, MapPin, Briefcase, Phone, Mail, Save, X } from 'lucide-react';
+import { Battery, Volume2, Trash2, Share2, Edit, UserCircle, MessageSquare, Mic, ChevronLeft, Brain, Heart, Smile, Notebook as Robot, Unlink, User, Calendar, MapPin, Briefcase, Phone, Mail, Save, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DeviceDetails {
@@ -51,7 +51,6 @@ const DeviceDetail: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState('gpt-4');
   const [selectedVoice, setSelectedVoice] = useState('female1');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('assistant');
   const [showRoleDetails, setShowRoleDetails] = useState(false);
   const [showUnbindConfirm, setShowUnbindConfirm] = useState(false);
@@ -159,50 +158,7 @@ const DeviceDetail: React.FC = () => {
     setDevice({ ...device, volume: newVolume });
   };
   
-  // Send a new message
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!newMessage.trim()) return;
-    
-    const userMessage: ChatMessage = {
-      id: `msg-${Date.now()}`,
-      sender: 'user',
-      content: newMessage,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    
-    setMessages([...messages, userMessage]);
-    setNewMessage('');
-    
-    // Simulate AI response after a short delay
-    setTimeout(() => {
-      const currentRole = aiRoles.find(role => role.id === selectedRole);
-      let response = '我理解你的问题，让我来帮助你解决这个问题。';
-      
-      // Customize response based on role
-      switch(selectedRole) {
-        case 'girlfriend':
-          response = '亲爱的，我完全理解你的感受。让我们一起来解决这个问题吧！';
-          break;
-        case 'crayon':
-          response = '哈哈哈！这个问题好有趣啊！让我想想该怎么回答...';
-          break;
-        case 'friend':
-          response = '嗯，我明白你的意思。作为朋友，我建议...';
-          break;
-      }
-      
-      const aiMessage: ChatMessage = {
-        id: `msg-${Date.now() + 1}`,
-        sender: 'ai',
-        content: response,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      
-      setMessages(prev => [...prev, aiMessage]);
-    }, 1000);
-  };
+
 
   // Handle device unbinding
   const handleUnbindDevice = async () => {
@@ -342,7 +298,7 @@ const DeviceDetail: React.FC = () => {
           }`}
           onClick={() => setActiveTab('chat')}
         >
-          聊天
+          说了什么
         </button>
         <button
           className={`flex-1 text-center py-2 ${
@@ -701,51 +657,86 @@ const DeviceDetail: React.FC = () => {
           </motion.div>
         )}
         
-        {/* Chat Tab */}
+        {/* Chat History Tab */}
         {activeTab === 'chat' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="h-[calc(100vh-220px)] flex flex-col"
+            className="space-y-4"
           >
-            <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`max-w-[80%] rounded-t-lg ${
-                    message.sender === 'user' 
-                      ? 'bg-blue-500 text-white rounded-bl-lg' 
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-br-lg'
-                  } p-3 shadow-sm`}
-                  >
-                    <p>{message.content}</p>
-                    <span className={`text-xs ${
-                      message.sender === 'user' 
-                        ? 'text-blue-100' 
-                        : 'text-gray-500 dark:text-gray-400'
-                    } block text-right mt-1`}>{message.timestamp}</span>
-                  </div>
-                </div>
-              ))}
+            {/* 聊天记录标题 */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+              <h3 className="font-medium text-gray-800 dark:text-white mb-2">聊天记录</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                查看您与 {device.name} 的对话历史
+              </p>
             </div>
-            
-            <form onSubmit={handleSendMessage} className="flex">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="输入消息..."
-                className="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-l-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-r-lg transition-colors"
-              >
-                发送
-              </button>
-            </form>
+
+            {/* 聊天记录列表 */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+              <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
+                {messages.length > 0 ? (
+                  messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className="border-b border-gray-100 dark:border-gray-700 last:border-b-0 pb-4 last:pb-0"
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
+                          message.sender === 'user'
+                            ? 'bg-blue-500'
+                            : 'bg-gray-500'
+                        }`}>
+                          {message.sender === 'user' ? '我' : 'AI'}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm font-medium text-gray-800 dark:text-white">
+                              {message.sender === 'user' ? '您' : device.name}
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {message.timestamp}
+                            </span>
+                          </div>
+                          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                            {message.content}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="text-gray-400 dark:text-gray-500 mb-2">
+                      <MessageSquare size={48} className="mx-auto" />
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      暂无聊天记录
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                      与设备的对话记录将显示在这里
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 统计信息 */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+              <h4 className="font-medium text-gray-800 dark:text-white mb-3">对话统计</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-500">{messages.length}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">总对话数</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-500">
+                    {messages.filter(m => m.sender === 'user').length}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">我的消息</div>
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
         
