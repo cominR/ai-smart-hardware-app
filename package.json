@@ -11,9 +11,13 @@
     "type-check": "tsc --noEmit",
     "git:setup": "scripts\\setup-git-hooks.bat",
     "git:commit": "scripts\\quick-commit.bat",
+    "git:setup-remote": "scripts\\setup-remote.bat",
+    "git:sync": "scripts\\git-sync.bat",
+    "git:branches": "scripts\\git-branches.bat",
     "git:status": "git status",
     "git:log": "git log --oneline -10",
-    "git:branches": "git branch -a"
+    "git:push": "git push origin master",
+    "git:pull": "git pull origin master"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",
