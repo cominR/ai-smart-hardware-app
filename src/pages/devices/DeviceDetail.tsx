@@ -662,81 +662,70 @@ const DeviceDetail: React.FC = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="space-y-4"
+            className="h-[calc(100vh-220px)] flex flex-col"
           >
-            {/* 聊天记录标题 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-              <h3 className="font-medium text-gray-800 dark:text-white mb-2">聊天记录</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                查看您与 {device.name} 的对话历史
-              </p>
-            </div>
-
-            {/* 聊天记录列表 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-              <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
-                {messages.length > 0 ? (
-                  messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className="border-b border-gray-100 dark:border-gray-700 last:border-b-0 pb-4 last:pb-0"
+            {messages.length > 0 ? (
+              <div className="flex-1 overflow-y-auto space-y-4 pb-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`max-w-[80%] rounded-t-lg ${
+                      message.sender === 'user'
+                        ? 'bg-blue-500 text-white rounded-bl-lg'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-br-lg'
+                    } p-3 shadow-sm`}
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
-                          message.sender === 'user'
-                            ? 'bg-blue-500'
-                            : 'bg-gray-500'
-                        }`}>
-                          {message.sender === 'user' ? '我' : 'AI'}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium text-gray-800 dark:text-white">
-                              {message.sender === 'user' ? '您' : device.name}
-                            </span>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {message.timestamp}
-                            </span>
-                          </div>
-                          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                            {message.content}
-                          </p>
-                        </div>
-                      </div>
+                      <p className="text-sm leading-relaxed">{message.content}</p>
+                      <span className={`text-xs ${
+                        message.sender === 'user'
+                          ? 'text-blue-100'
+                          : 'text-gray-500 dark:text-gray-400'
+                      } block text-right mt-2`}>{message.timestamp}</span>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <div className="text-gray-400 dark:text-gray-500 mb-2">
-                      <MessageSquare size={48} className="mx-auto" />
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      暂无聊天记录
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                      与设备的对话记录将显示在这里
-                    </p>
                   </div>
-                )}
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-gray-400 dark:text-gray-500 mb-4">
+                    <MessageSquare size={64} className="mx-auto" />
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400 text-lg font-medium">
+                    暂无对话记录
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+                    与 {device.name} 的对话记录将显示在这里
+                  </p>
+                </div>
+              </div>
+            )}
 
-            {/* 统计信息 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-              <h4 className="font-medium text-gray-800 dark:text-white mb-3">对话统计</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-500">{messages.length}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">总对话数</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-500">
-                    {messages.filter(m => m.sender === 'user').length}
+            {/* 底部统计信息 */}
+            {messages.length > 0 && (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                <div className="flex justify-center space-x-8 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-center">
+                    <div className="font-semibold text-blue-500">{messages.length}</div>
+                    <div>总消息</div>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">我的消息</div>
+                  <div className="text-center">
+                    <div className="font-semibold text-green-500">
+                      {messages.filter(m => m.sender === 'user').length}
+                    </div>
+                    <div>我发送</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-semibold text-purple-500">
+                      {messages.filter(m => m.sender === 'ai').length}
+                    </div>
+                    <div>AI回复</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </motion.div>
         )}
         
